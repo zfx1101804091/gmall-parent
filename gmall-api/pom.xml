@@ -34,5 +34,12 @@
             <!--可选依赖，只是为了防止工程mp的注解报错问题-->
             <!--<optional>true</optional>-->
         </dependency>
+
+        <!--配置多数据源-->
+        <dependency>
+            <groupId>io.shardingjdbc</groupId>
+            <artifactId>sharding-jdbc-core</artifactId>
+            <version>2.0.3</version>
+        </dependency>
     </dependencies>
 </project>

@@ -1,10 +1,10 @@
 package com.zfx.gmall.pms.service.impl;
 
+import com.alibaba.dubbo.config.annotation.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zfx.gmall.pms.entity.Product;
 import com.zfx.gmall.pms.mapper.ProductMapper;
 import com.zfx.gmall.pms.service.ProductService;
-import org.springframework.stereotype.Service;
 
 /**
  * <p>
