@@ -32,7 +32,7 @@
             <artifactId>mybatis-plus-boot-starter</artifactId>
             <version>3.1.0</version>
             <!--可选依赖，只是为了防止工程mp的注解报错问题-->
-            <optional>true</optional>
+            <!--<optional>true</optional>-->
         </dependency>
     </dependencies>
 </project>
