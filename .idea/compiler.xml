@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="gmall-admin-web" />
+        <module name="gmall-api" />
+        <module name="gmall-common" />
+        <module name="gmall-oms" />
+        <module name="gmall-pms" />
+        <module name="gmall-sms" />
+        <module name="gmall-ums" />
+      </profile>
+    </annotationProcessing>
+  </component>
+</project>
