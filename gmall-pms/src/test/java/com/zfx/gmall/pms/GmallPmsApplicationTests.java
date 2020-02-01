@@ -1,5 +1,6 @@
 package com.zfx.gmall.pms;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.baomidou.mybatisplus.extension.service.additional.update.impl.UpdateChainWrapper;
 import com.zfx.gmall.pms.entity.Brand;
 import com.zfx.gmall.pms.entity.Product;
@@ -15,7 +16,7 @@ import java.util.List;
 public class GmallPmsApplicationTests {
 
 
-    @Autowired
+    @Reference
     ProductService productService;
 
     @Autowired
