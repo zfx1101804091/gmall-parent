@@ -1,9 +1,9 @@
 package com.zfx.gmall.admin.pms.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.zfx.gmall.admin.pms.vo.PmsBrandParam;
 import com.zfx.gmall.pms.service.BrandService;
 import com.zfx.gmall.to.CommonResult;
+import com.zfx.gmall.vo.product.PmsBrandParam;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.BindingResult;

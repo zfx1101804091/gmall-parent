@@ -10,6 +10,7 @@ import com.zfx.gmall.ums.entity.Admin;
 import com.zfx.gmall.ums.service.AdminService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.BindingResult;
@@ -23,6 +24,7 @@ import java.util.Map;
 /**
  * 后台用户管理
  */
+@Slf4j
 @CrossOrigin//跨域注解
 @RestController
 @Api(tags = "AdminController", description = "后台用户管理")
@@ -55,7 +57,7 @@ public class UmsAdminController {
     public Object login(@RequestBody UmsAdminLoginParam umsAdminLoginParam, BindingResult result) {
         //去数据库登陆
         Admin admin = adminService.login(umsAdminLoginParam.getUsername(), umsAdminLoginParam.getPassword());
-
+        log.info("login 参数去数据库查到的数据----",admin);
         //登陆成功生成token，此token携带基本用户信息，以后就不用去数据库了
         String token = jwtTokenUtil.generateToken(admin);
         if (token == null) {
@@ -98,7 +100,7 @@ public class UmsAdminController {
         String oldToken = request.getHeader(tokenHeader);
         //这里配置了gmall.jwt.tokenHead=Bearer;token加了个头，所以解析时需要去掉Bearer
         String userName = jwtTokenUtil.getUserNameFromToken(oldToken.substring(tokenHead.length()));
-
+        log.info("jwtTokenUtil.getUserNameFromToken(oldToken.substring(tokenHead.length()))----",userName);
         /*
             1、getOne是mybatis-plus生成的，而且带了泛型的。
             2、dubbo没办法直接调用mp中带泛型的service;

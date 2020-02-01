@@ -1,8 +1,8 @@
 package com.zfx.gmall.admin.pms.controller;
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.zfx.gmall.admin.pms.vo.PmsProductAttributeParam;
 import com.zfx.gmall.pms.service.ProductAttributeService;
 import com.zfx.gmall.to.CommonResult;
+import com.zfx.gmall.vo.product.PmsProductAttributeParam;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -42,7 +42,7 @@ public class PmsProductAttributeController {
 
     @ApiOperation("修改商品属性信息")
     @PostMapping(value = "/update/{id}")
-    public Object update(@PathVariable Long id,@RequestBody PmsProductAttributeParam productAttributeParam,BindingResult bindingResult){
+    public Object update(@PathVariable Long id, @RequestBody PmsProductAttributeParam productAttributeParam, BindingResult bindingResult){
         //TODO 修改商品属性信息
         return new CommonResult().success(null);
     }
