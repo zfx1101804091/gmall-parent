@@ -38,11 +38,10 @@ public class DataVaildAsPect {
 
     //@AspectJ 语法基础
     @Around("execution(* com.zfx.gmall.admin..*Controller.*(..))")
-    public Object vaildAround(ProceedingJoinPoint point){
+    public Object vaildAround(ProceedingJoinPoint point) throws Throwable {
 
         Object proceed = null;
 
-        try {
             //获取目标方法的参数值
             Object[] args = point.getArgs();
 
@@ -64,11 +63,46 @@ public class DataVaildAsPect {
             proceed = point.proceed(args);
 
             log.debug("校验切面将目标方法已执行......{}",proceed);
+
+        return proceed;
+    }
+
+//---------------第一版version1.0.1[start]-----------------//
+    //@AspectJ 语法基础
+    /*@Around("execution(* com.zfx.gmall.admin..*Controller.*(..))")
+    public Object vaildAround(ProceedingJoinPoint point){
+
+        Object proceed = null;
+
+        try {
+            //获取目标方法的参数值
+            Object[] args = point.getArgs();
+
+            for (Object arg : args) {
+                //判断获取的对象类型是否为BindingResult的实例，是就进行类型强转
+                if(arg instanceof BindingResult){
+                    BindingResult result = (BindingResult)arg;
+                    if(result.getErrorCount()>0){
+                        //框架的自动校验检测到错误了
+                        return new CommonResult().validateFailed(result);
+                    }
+
+                }
+            }
+
+            log.debug("校验切面介入工作......");
+
+            //下面 就是我反射的 method.invoke()
+            proceed = point.proceed(args);
+
+            log.debug("校验切面将目标方法已执行......{}",proceed);
         } catch (Throwable throwable) {
             log.error("---异常通知---");
+            throw new RuntimeException(throwable);
         }finally {
             log.debug("---后置通知---");
         }
         return proceed;
-    }
+    }*/
+//---------------第一版version1.0.1[end]-----------------//
 }

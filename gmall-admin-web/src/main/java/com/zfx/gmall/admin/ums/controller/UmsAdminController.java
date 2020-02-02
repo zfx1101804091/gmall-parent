@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -74,7 +73,7 @@ public class UmsAdminController {
             //TODO 完成注册功能
 
         }*/
-
+        int a = 1/0;
         log.debug("注册用户信息----{}",umsAdminParam);
         return new CommonResult().success(admin);
     }
