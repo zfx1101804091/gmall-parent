@@ -59,7 +59,7 @@ public class UmsAdminController {
 
         Admin admin = null;
 
-        int errorCount = bindingResult.getErrorCount();
+       /* int errorCount = bindingResult.getErrorCount();
         if(errorCount>0){
             //说明校验有问题，需要处理
             List<FieldError> fieldErrors = bindingResult.getFieldErrors();
@@ -73,7 +73,7 @@ public class UmsAdminController {
         }else {
             //TODO 完成注册功能
 
-        }
+        }*/
 
         log.debug("注册用户信息----{}",umsAdminParam);
         return new CommonResult().success(admin);
