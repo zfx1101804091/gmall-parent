@@ -46,6 +46,8 @@ public class PmsProductCategoryController {
                           @RequestParam(value = "pageSize", defaultValue = "5") Integer pageSize,
                           @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
         //TODO 分页查询商品分类
+
+
         return new CommonResult().success(null);
     }
 

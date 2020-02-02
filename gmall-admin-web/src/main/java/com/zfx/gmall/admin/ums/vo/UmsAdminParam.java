@@ -3,6 +3,7 @@ package com.zfx.gmall.admin.ums.vo;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -12,6 +13,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  */
 @Getter
 @Setter
+@ToString
 public class UmsAdminParam {
     @ApiModelProperty(value = "用户名", required = true)
     @NotEmpty(message = "用户名不能为空")

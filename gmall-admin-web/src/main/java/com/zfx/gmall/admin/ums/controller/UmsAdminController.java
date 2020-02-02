@@ -23,6 +23,8 @@ import java.util.Map;
 
 /**
  * 后台用户管理
+ * SpringMVC支持使用【JSR303】方式进行校验
+ *  1，springboot默认导第三方校验框架hibernate-validator
  */
 @Slf4j
 @CrossOrigin//跨域注解
@@ -49,6 +51,7 @@ public class UmsAdminController {
         Admin admin = null;
         //TODO 完成注册功能
 
+        log.debug("注册用户信息----{}",umsAdminParam);
         return new CommonResult().success(admin);
     }
 
