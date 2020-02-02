@@ -1,7 +1,6 @@
 package com.zfx.gmall.admin.ums.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.zfx.gmall.admin.ums.vo.UmsAdminLoginParam;
 import com.zfx.gmall.admin.ums.vo.UmsAdminParam;
 import com.zfx.gmall.admin.utils.JwtTokenUtil;
@@ -14,9 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,14 @@ import java.util.Map;
 /**
  * 后台用户管理
  * SpringMVC支持使用【JSR303】方式进行校验
- *  1，springboot默认导第三方校验框架hibernate-validator
+ *  1)、springboot默认导第三方校验框架hibernate-validator
+ *
+ *  2)、使用JSR303的三大步
+ *      1、给需要校验数据的javaBean.上标注校验注解;
+ *      2、告诉SpringBoot,这个需要校验; @Valid
+ *          springmvc进入方法之前，确定参数值的时候就会进行校验，如果校验出错，直接返回错误，不执行controller
+ *      3、如何感知校验成功还是失败;
+ *          只需要给开启了校验的javaBean参数后面，紧跟- -个BindingResul t对象就可以获取到校验结果
  */
 @Slf4j
 @CrossOrigin//跨域注解
@@ -47,9 +55,25 @@ public class UmsAdminController {
 
     @ApiOperation(value = "用户注册")
     @PostMapping(value = "/register")
-    public Object register(@RequestBody UmsAdminParam umsAdminParam, BindingResult result) {
+    public Object register(@Valid @RequestBody UmsAdminParam umsAdminParam,BindingResult bindingResult) {
+
         Admin admin = null;
-        //TODO 完成注册功能
+
+        int errorCount = bindingResult.getErrorCount();
+        if(errorCount>0){
+            //说明校验有问题，需要处理
+            List<FieldError> fieldErrors = bindingResult.getFieldErrors();
+            fieldErrors.forEach((fieldError)->{
+                String field = fieldError.getField();
+                Object rejectedValue = fieldError.getRejectedValue();
+                String defaultMessage = fieldError.getDefaultMessage();
+                log.debug("属性：{},传来的值：{}, 校验出错,出错的提示消息：{}",field,rejectedValue,defaultMessage);
+            });
+            return new CommonResult().validateFailed(bindingResult);
+        }else {
+            //TODO 完成注册功能
+
+        }
 
         log.debug("注册用户信息----{}",umsAdminParam);
         return new CommonResult().success(admin);

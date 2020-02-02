@@ -30,4 +30,5 @@
     </root>
 
     <logger level="DEBUG" name="com.zfx.gmall.admin"/>
+
 </configuration>
