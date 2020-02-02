@@ -37,6 +37,7 @@ import org.springframework.validation.BindingResult;
 public class DataVaildAsPect {
 
     //@AspectJ 语法基础
+    //目标方法的异常，-一般都需要再次抛出去。让别人感知
     @Around("execution(* com.zfx.gmall.admin..*Controller.*(..))")
     public Object vaildAround(ProceedingJoinPoint point) throws Throwable {
 
