@@ -60,7 +60,7 @@ public class DataVaildAsPect {
 
             log.debug("校验切面介入工作......");
 
-            //下面 就是我反射的 method.invoke()
+            //下面 就是我反射的 method.invoke()----执行方法
             proceed = point.proceed(args);
 
             log.debug("校验切面将目标方法已执行......{}",proceed);

@@ -83,7 +83,7 @@ public class UmsAdminController {
     public Object login(@RequestBody UmsAdminLoginParam umsAdminLoginParam, BindingResult result) {
         //去数据库登陆
         Admin admin = adminService.login(umsAdminLoginParam.getUsername(), umsAdminLoginParam.getPassword());
-        log.info("login 参数去数据库查到的数据----",admin);
+        log.info("login 参数去数据库查到的数据----{}",admin);
         //登陆成功生成token，此token携带基本用户信息，以后就不用去数据库了
         String token = jwtTokenUtil.generateToken(admin);
         if (token == null) {
