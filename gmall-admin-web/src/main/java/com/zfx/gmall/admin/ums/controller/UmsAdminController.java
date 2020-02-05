@@ -73,7 +73,8 @@ public class UmsAdminController {
             //TODO 完成注册功能
 
         }*/
-        int a = 1/0;
+
+        //int a = 1/0;
         log.debug("注册用户信息----{}",umsAdminParam);
         return new CommonResult().success(admin);
     }

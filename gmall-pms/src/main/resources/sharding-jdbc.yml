@@ -16,3 +16,4 @@ masterSlaveRule:
 
 ###注意，这份文档直接从官网复制的。!!后面是DataSource的实现类全类名不能省略。
 ###多个slave加多份db_slaveXX配置即可，在slaveDataSourceNames列举这些slaver
+###多个从库：slaveDataSourceNames: [db_slave,db_slave1,db_slave2]
