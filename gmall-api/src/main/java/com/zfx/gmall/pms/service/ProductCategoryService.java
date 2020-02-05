@@ -2,6 +2,9 @@ package com.zfx.gmall.pms.service;
 
 import com.zfx.gmall.pms.entity.ProductCategory;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.zfx.gmall.vo.product.PmsProductCategoryWithChildrenItem;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface ProductCategoryService extends IService<ProductCategory> {
 
+    List<PmsProductCategoryWithChildrenItem> listProductCategoryChildren(Integer i);
 }
