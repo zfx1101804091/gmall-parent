@@ -18,6 +18,8 @@
         <result column="description" property="description" />
     </resultMap>
 
+
+
     <!--使用mybatis-collection封装集合数据，完成递归菜单的无限极分类查询"-->
     <resultMap id="ExtendResultMap" type="com.zfx.gmall.vo.product.PmsProductCategoryWithChildrenItem" extends="BaseResultMap">
         <collection property="children" select="listProductCategoryChildren" column="id"/>

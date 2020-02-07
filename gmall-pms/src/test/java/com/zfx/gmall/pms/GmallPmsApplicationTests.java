@@ -9,6 +9,8 @@ import com.zfx.gmall.pms.service.ProductService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.util.List;
 
@@ -21,6 +23,12 @@ public class GmallPmsApplicationTests {
 
     @Autowired
     BrandService brandService;
+
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    RedisTemplate redisTemplate;
 
     @Test
     public void contextLoads() {
@@ -61,4 +69,35 @@ public class GmallPmsApplicationTests {
         Brand byId = brandService.getById(54L);
         System.out.println("查询的数据----"+byId.getName());
     }
+
+    /*
+    * redis的测试
+           redis Template.opsForValue() //操作redis中string类型的
+           redisTemplate.opsForHash() //操作redis中 hash类型的
+           redisTemplate.opsForlist() ////操作redis中list类型的
+    * */
+    @Test
+    public void redisTest() {
+        //redis操作k-v都为String的字符串
+        stringRedisTemplate.opsForValue().set("name","zhangsan");
+        System.out.println("存入redis的数据 name:"+stringRedisTemplate.opsForValue().get("name"));
+
+    }
+    @Test
+    public void redisTestObject() {
+        //redis操作对象
+        Brand brand = new Brand();
+        brand.setName("无敌").setSort(10).setBrandStory("hahahahhaha");
+        redisTemplate.opsForValue().set("brand4",brand);
+        System.out.println("存入redis的对象 brand3:"+redisTemplate.opsForValue().get("brand"));
+
+    }
+    @Test
+    public void redisTestObjectMv() {
+        Object obj = redisTemplate.opsForValue().get("brand4");
+        System.out.println("存入redis的对象 brand4:"+obj);
+        redisTemplate.delete("brand4");
+        System.out.println("删除成功");
+    }
+
 }
