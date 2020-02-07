@@ -28,4 +28,6 @@
         <appender-ref ref="FILE"/>
         <appender-ref ref="LOGSTASH"/>
     </root>
+
+    <logger level="DEBUG" name="com.zfx.gmall.pms.service.impl"/>
 </configuration>
