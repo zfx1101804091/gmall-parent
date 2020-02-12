@@ -13,4 +13,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface MemberLevelService extends IService<MemberLevel> {
 
+    Object levelList();
 }
