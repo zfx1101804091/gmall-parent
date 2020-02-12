@@ -1,4 +1,4 @@
-package com.zfx.gmall.admin.oms.component;
+package com.zfx.gmall.admin.oss.component;
 
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.common.utils.BinaryUtil;
