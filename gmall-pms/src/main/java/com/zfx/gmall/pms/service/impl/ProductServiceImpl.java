@@ -11,6 +11,7 @@ import com.zfx.gmall.pms.service.ProductService;
 import com.zfx.gmall.vo.PageInfoVo;
 import com.zfx.gmall.vo.product.PmsProductParam;
 import com.zfx.gmall.vo.product.PmsProductQueryParam;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,8 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>
@@ -27,6 +30,7 @@ import java.time.format.DateTimeFormatter;
  * @author zheng_fx
  * @since 2020-01-31
  */
+@Slf4j
 @Component
 @Service
 public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> implements ProductService {
@@ -41,6 +45,11 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     ProductLadderMapper productLadderMapper;
     @Autowired
     SkuStockMapper skuStockMapper;
+
+    //当前线程共享同样的数据 把下面需要使用的productId 存入
+    ThreadLocal<Long> threadLocal =  new ThreadLocal();
+    //ThreadLocal底层原理
+    Map<Thread,Long> map = new HashMap();
 
     @Override
     public PageInfoVo productPageInfo(PmsProductQueryParam param) {
@@ -78,39 +87,70 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     @Override
     public void saveProduct(PmsProductParam productParam) {
         //1)、pms_product: 保存商品基本信息
-        Product product = new Product();
-
-        BeanUtils.copyProperties(productParam,product);//将前台传递过来的数据源内的相同属性copy过来赋值给product
-        productMapper.insert(product);
+        saveBaseInfo(productParam);
 
         //2)、pms_product_attribute_value: 保存这个商品对应的所有属性的值
-        productParam.getProductAttributeValueList().forEach(productAttributeValue -> {
-            //在pms_product_attribute_value表内需要设置其关联的productId
-            productAttributeValue.setProductId(product.getId());
-            productAttributeValueMapper.insert(productAttributeValue);
-        });
+        saveProductAttributeValue(productParam);
 
         //3)、pms_product_full_reduction: 保存商品的满诚信息
-        productParam.getProductFullReductionList().forEach(productFullReduction -> {
-            productFullReduction.setProductId(product.getId());
-            productFullReductionMapper.insert(productFullReduction);
-        });
+        saveProductFullReduction(productParam);
 
         //4)、pms_product_ladder: 满减表
-        productParam.getProductLadderList().forEach(productLadder -> {
-            productLadder.setProductId(product.getId());
-            productLadderMapper.insert(productLadder);
-        });
+        saveProductLadder(productParam);
 
         //5)、pms_sku_stock_sku_ 库存表
+        saveSkuStock(productParam);
+    }
+
+    public void saveSkuStock(PmsProductParam productParam) {
         productParam.getSkuStockList().forEach(skuStock -> {
-            skuStock.setProductId(product.getId());
+            skuStock.setProductId(threadLocal.get());
             //生成sku_code的默认值
             if(StringUtils.isEmpty(skuStock.getSkuCode())){
-                skuStock.setSkuCode(getTimeStr()+"_"+product.getId());
+                skuStock.setSkuCode(getTimeStr()+"_"+threadLocal.get());
             }
             skuStockMapper.insert(skuStock);
         });
+        log.debug("saveSkuStock-->>当前线程--{}-->线程名：{}--->productID:{}-->{}"
+                ,Thread.currentThread().getId(),Thread.currentThread().getName(),threadLocal.get(),map.get(Thread.currentThread()));
+    }
+
+    public void saveProductLadder(PmsProductParam productParam) {
+        productParam.getProductLadderList().forEach(productLadder -> {
+            productLadder.setProductId(threadLocal.get());
+            productLadderMapper.insert(productLadder);
+        });
+        log.debug("saveSkuStock-->>当前线程--{}-->线程名：{}--->productID:{}-->{}"
+                ,Thread.currentThread().getId(),Thread.currentThread().getName(),threadLocal.get(),map.get(Thread.currentThread()));
+    }
+
+    public void saveProductFullReduction(PmsProductParam productParam) {
+        productParam.getProductFullReductionList().forEach(productFullReduction -> {
+            productFullReduction.setProductId(threadLocal.get());
+            productFullReductionMapper.insert(productFullReduction);
+        });
+        log.debug("saveSkuStock-->>当前线程--{}-->线程名：{}--->productID:{}-->{}"
+                ,Thread.currentThread().getId(),Thread.currentThread().getName(),threadLocal.get(),map.get(Thread.currentThread()));
+    }
+
+    public void saveProductAttributeValue(PmsProductParam productParam) {
+        productParam.getProductAttributeValueList().forEach(productAttributeValue -> {
+            //在pms_product_attribute_value表内需要设置其关联的productId
+            productAttributeValue.setProductId(threadLocal.get());
+            productAttributeValueMapper.insert(productAttributeValue);
+        });
+        log.debug("saveSkuStock-->>当前线程--{}-->线程名：{}--->productID:{}-->{}"
+                ,Thread.currentThread().getId(),Thread.currentThread().getName(),threadLocal.get(),map.get(Thread.currentThread()));
+    }
+
+    public void saveBaseInfo(PmsProductParam productParam) {
+        Product product = new Product();
+        BeanUtils.copyProperties(productParam,product);//将前台传递过来的数据源内的相同属性copy过来赋值给product
+        productMapper.insert(product);
+        //将商品基础信息的productId存入ThreadLocal中
+        threadLocal.set(product.getId());
+        //ThreadLocal底层原理实现
+        map.put(Thread.currentThread(),product.getId());
     }
 
     public String getTimeStr(){
