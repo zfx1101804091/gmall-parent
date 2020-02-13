@@ -47,9 +47,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     SkuStockMapper skuStockMapper;
 
     //当前线程共享同样的数据 把下面需要使用的productId 存入
-    ThreadLocal<Long> threadLocal =  new ThreadLocal();
+    private static final ThreadLocal<Long> threadLocal =  new ThreadLocal();
     //ThreadLocal底层原理
-    Map<Thread,Long> map = new HashMap();
+    private static final Map<Thread,Long> map = new HashMap();
 
     @Override
     public PageInfoVo productPageInfo(PmsProductQueryParam param) {
@@ -100,6 +100,16 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
 
         //5)、pms_sku_stock_sku_ 库存表
         saveSkuStock(productParam);
+
+        /*
+        * 使用ThreadLocal时遵守以下两个小原则 防止内存溢出:
+            ①ThreadLocal申明为private static final。
+                 Private与final 尽可能不让他人修改变更引用，
+                 Static 表示为类属性，只有在程序结束才会被回收。
+            ②ThreadLocal使用后务必调用remove方法。
+                最简单有效的方法是使用后将其移除。
+        * */
+        threadLocal.remove();
     }
 
     public void saveSkuStock(PmsProductParam productParam) {
