@@ -26,9 +26,10 @@ public class PmsProductController {
 
     @ApiOperation("创建商品")
     @PostMapping(value = "/create")
-    public Object create(@RequestBody PmsProductParam productParam,
-                         BindingResult bindingResult) {
-        //TODO 查询所有一级分类及子分类
+    public Object create(@RequestBody PmsProductParam productParam) {
+        //保存商品信息
+        productService.saveProduct(productParam);
+
         return new CommonResult().success(null);
     }
 
