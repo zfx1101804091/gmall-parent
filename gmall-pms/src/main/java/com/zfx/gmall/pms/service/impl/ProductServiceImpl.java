@@ -19,6 +19,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -136,6 +140,10 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
      * 	--传播行为总是来定义，当-个事务存在的时候，他内部的事务该怎么执行。
      * 	#########################################
      *
+     *事务的问题:
+     * 	Service自己调用自己的方法，无法加上真正的自己内部调整的各个事务
+     * 	解决:如果是_对象.方法()那就好了
+     * 		1)、 要是能军到ioc容器，从容器中再把我们的组件获取一下，用对象调方法。
      *
      *
      * @Transactional  一定不要标准在Controller
@@ -143,6 +151,26 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
      * //基于反射调用了
      *  对象.方法（）才可以调用事务
      *  本类调用自己的方法，相当于用的同一个事务saveProduct
+     *
+     *
+     * 复习:事务传播行为，
+     * ===============================================
+     * 隔离级别:解决读写加锁问题的(数据底层的方案)。可重复读 (快照)
+     * 	读未提交:
+     * 	读已提交:
+     * 	可重复读:
+     * 	串行化:
+     * ===============================================
+     * 异常回滚策略
+     * 异常:
+     * 		运行时异常(不受检查异常)
+     * 	        ArithmeticException .....
+     * 		编译时异常(受检异常)
+     * 	        FileNotFound; 1) 要么throw要么try- catch
+     *
+     * 运行的异常默认是一定回滚
+     * 编译时异常默认是不回滚的，
+     * rollbackFor:指定哪些异常-定回滚的
      *
      */
     @Transactional(propagation = Propagation.REQUIRED)
@@ -162,7 +190,12 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
         saveProductFullReduction(productParam);
 
         //4)、pms_product_ladder: 满减表-->>REQUIRED_NEW 新开事务，各自互不影响
-        saveProductLadder(productParam);
+        try {
+            saveProductLadder(productParam);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            log.error("捕获的异常---{}",e.getMessage());
+        }
 
 
 
@@ -192,14 +225,16 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void saveProductLadder(PmsProductParam productParam) {
+    public void saveProductLadder(PmsProductParam productParam) throws FileNotFoundException {
         productParam.getProductLadderList().forEach(productLadder -> {
             productLadder.setProductId(threadLocal.get());
             productLadderMapper.insert(productLadder);
         });
         log.debug("saveSkuStock-->>当前线程--{}-->线程名：{}--->productID:{}-->{}"
                 ,Thread.currentThread().getId(),Thread.currentThread().getName(),threadLocal.get(),map.get(Thread.currentThread()));
-        int i =1/0;
+        //int i =1/0;
+        File tttt = new File("tttt");//编译时异常默认不回滚，会存库
+        new FileInputStream(tttt);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
