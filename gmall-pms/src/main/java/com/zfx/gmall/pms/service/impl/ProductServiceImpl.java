@@ -197,7 +197,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
         //4)、pms_product_ladder: 满减表-->>REQUIRED_NEW 新开事务，各自互不影响
         try {
             proxy.saveProductLadder(productParam);
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             log.error("捕获的异常---{}",e.getMessage());
         }
@@ -229,17 +229,20 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
                 ,Thread.currentThread().getId(),Thread.currentThread().getName(),threadLocal.get(),map.get(Thread.currentThread()));
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW,rollbackFor =FileNotFoundException.class )
-    public void saveProductLadder(PmsProductParam productParam) throws FileNotFoundException {
+   /* @Transactional(propagation = Propagation.REQUIRES_NEW
+            ,rollbackFor =FileNotFoundException.class
+            ,noRollbackFor = {ArithmeticException.class,NullPointerException.class})*/
+   @Transactional(propagation = Propagation.REQUIRES_NEW,rollbackFor = Exception.class)//实际企业这么用，所有的异常都回滚
+    public void saveProductLadder(PmsProductParam productParam) {
         productParam.getProductLadderList().forEach(productLadder -> {
             productLadder.setProductId(threadLocal.get());
             productLadderMapper.insert(productLadder);
         });
         log.debug("saveSkuStock-->>当前线程--{}-->线程名：{}--->productID:{}-->{}"
                 ,Thread.currentThread().getId(),Thread.currentThread().getName(),threadLocal.get(),map.get(Thread.currentThread()));
-        //int i =1/0;
-        File tttt = new File("tttt");//编译时异常默认不回滚，会存库
-        new FileInputStream(tttt);
+        int i =1/0;
+//        File tttt = new File("tttt");//编译时异常默认不回滚，会存库
+//        new FileInputStream(tttt);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
