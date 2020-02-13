@@ -12,6 +12,7 @@ import com.zfx.gmall.vo.PageInfoVo;
 import com.zfx.gmall.vo.product.PmsProductParam;
 import com.zfx.gmall.vo.product.PmsProductQueryParam;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -52,13 +53,13 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     @Autowired
     SkuStockMapper skuStockMapper;
 
-
     //spring的所有组件全是单例，一定会出现线程安全问题
     //只要没有共享属性，一个要读，一个要改，就不会出现安全问题；
     //当前线程共享同样的数据 把下面需要使用的productId 存入
     private static final ThreadLocal<Long> threadLocal =  new ThreadLocal();
     //ThreadLocal底层原理
     private static final Map<Thread,Long> map = new HashMap();
+
 
     @Override
     public PageInfoVo productPageInfo(PmsProductQueryParam param) {
@@ -176,22 +177,26 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void saveProduct(PmsProductParam productParam) {
+
+        //使用代理对象调用方法，使用事务机制
+        ProductServiceImpl proxy = (ProductServiceImpl) AopContext.currentProxy();
+
         //1)、pms_product: 保存商品基本信息-->>【REQUIRED】--此方法需要事务，如果没有就开新事务，如果之前已存在就用以前事务
-        saveBaseInfo(productParam);
+        proxy.saveBaseInfo(productParam);
 
         //5)、pms_sku_stock_sku_ 库存表-->>【REQUIRED】--此方法需要事务，如果没有就开新事务，如果之前已存在就用以前事务
-        saveSkuStock(productParam);
+        proxy.saveSkuStock(productParam);
 
         /*以下都可以try- cotch互不影响*/
         //2)、pms_product_attribute_value: 保存这个商品对应的所有属性的值-->>REQUIRED_NEW 新开事务，各自互不影响
-        saveProductAttributeValue(productParam);
+        proxy.saveProductAttributeValue(productParam);
 
         //3)、pms_product_full_reduction: 保存商品的满诚信息-->>REQUIRED_NEW 新开事务，各自互不影响
-        saveProductFullReduction(productParam);
+        proxy.saveProductFullReduction(productParam);
 
         //4)、pms_product_ladder: 满减表-->>REQUIRED_NEW 新开事务，各自互不影响
         try {
-            saveProductLadder(productParam);
+            proxy.saveProductLadder(productParam);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             log.error("捕获的异常---{}",e.getMessage());
@@ -224,7 +229,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
                 ,Thread.currentThread().getId(),Thread.currentThread().getName(),threadLocal.get(),map.get(Thread.currentThread()));
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW,rollbackFor =FileNotFoundException.class )
     public void saveProductLadder(PmsProductParam productParam) throws FileNotFoundException {
         productParam.getProductLadderList().forEach(productLadder -> {
             productLadder.setProductId(threadLocal.get());
