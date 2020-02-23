@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * 	跨域也可以做安全限制
  * 	图片显示上传需要开启oss的跨域设置和读写设置
  */
-//@CrossOrigin(origins = "http://192.168.25.20/***")
+//@CrossOrigin(origins = "http://192.168.199.106/***")
 @CrossOrigin
 @Controller
 @Api(tags = "OssController",description = "Oss管理")
